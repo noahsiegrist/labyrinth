@@ -8,70 +8,31 @@
 
 <script>
     import Tile from './Tile'
+    import { mapActions, mapGetters } from 'vuex'
 
     export default {
         name: 'Matrix',
         components: {Tile},
-        data() {
-            return {
-                matrix:
-                    [
-                        [
-                            {
-                                right: false,
-                                bottom: false,
-                            },
-                            {
-                                right: false,
-                                bottom: false,
-                            },
-                            {
-                                right: false,
-                                bottom: false,
-                            },
-                        ],
-                        [
-                            {
-                                right: false,
-                                bottom: false,
-                            },
-                            {
-                                right: false,
-                                bottom: false,
-                            },
-                            {
-                                right: false,
-                                bottom: false,
-                            },
-                        ],
-                        [
-                            {
-                                right: false,
-                                bottom: false,
-                            },
-                            {
-                                right: false,
-                                bottom: false,
-                            },
-                            {
-                                right: false,
-                                bottom: false,
-                            },
-                        ],
-                    ],
-            };
+        methods: {
+            ...mapActions(["init"]),
+        },
+        computed: {
+            ...mapGetters(["matrix"])
+        },
+        created() {
+            console.log('initate the matrix')
+            this.init();
         }
     }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style scoped lang="scss">
     .table {
         margin: auto;
         display: table;
         max-width: 100%;
         width: 90vh;
-        border: 2px #c5c5c5 solid;
+        border: 2px #000 solid;
 
     }
     .row {

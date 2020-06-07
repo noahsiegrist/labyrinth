@@ -4,24 +4,19 @@
   </div>
 </template>
 
-<script>
-import Matrix from './components/Matrix.vue'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator';
+import Matrix from './components/Matrix.vue';
 
-export default {
-  name: 'App',
+
+@Component({
   components: {
-    Matrix
-  }
-}
+    Matrix,
+  },
+})
+export default class App extends Vue {}
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style lang="scss">
+
 </style>
