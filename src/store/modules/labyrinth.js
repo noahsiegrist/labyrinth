@@ -1,9 +1,9 @@
 const state = {
-    n: 15,
-    m: 15,
+    n: 31,
+    m: 31,
     matrix: [],
     start: {y: 0, x: 0},
-    end: {y: 14, x: 14},
+    end: {y: 30, x: 30},
 };
 
 const getters = {
@@ -40,7 +40,10 @@ const actions = {
     },
     reset({state}) {
         state.matrix.forEach(row => {
-            row.forEach(item => state.matrix[item.y][item.x] = {...item, color: 0, parent: null})
+            row.forEach(async item => {
+                state.matrix[item.y][item.x] = {...item, color: 0, parent: null}
+                await new Promise(resolve => setTimeout(resolve, 1))
+            })
         })
     },
 
