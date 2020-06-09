@@ -20,7 +20,6 @@
             ...mapGetters(["matrix"])
         },
         created() {
-            console.log('initate the matrix')
             this.init();
         }
     }

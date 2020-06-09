@@ -1,19 +1,27 @@
 const state = {
-    n: 30,
-    m: 30,
-    matrix: []
+    n: 15,
+    m: 15,
+    matrix: [],
+    start: {y: 0, x: 0},
+    end: {y: 14, x: 14},
 };
 
 const getters = {
-    matrix: state => state.matrix
+    matrix: state => state.matrix,
+    start: state => {
+        if(state.matrix.length === 0){
+            actions.init({state})
+        }
+        return {...state.matrix[state.start.y][state.start.x]}},
+    end: state =>  { return {...state.matrix[state.end.y][state.end.x]}},
 };
 
 const actions = {
     init({state}) {
-        var matrix = []
-        for (var i = 0; i < state.n; i++) {
-            var row = [];
-            for (var j = 0; j < state.m; j++) {
+        let matrix = []
+        for (let i = 0; i < state.n; i++) {
+            let row = [];
+            for (let j = 0; j < state.m; j++) {
                 row.push({
                     y: i,
                     x: j,
@@ -21,13 +29,21 @@ const actions = {
                     right: j + 1 === state.m,
                     bottom: i + 1 === state.n,
                     left: j === 0,
+                    color: 0,
+                    parent: null
                 })
             }
             matrix.push(row)
         }
 
         return state.matrix = matrix
-    }
+    },
+    reset({state}) {
+        state.matrix.forEach(row => {
+            row.forEach(item => state.matrix[item.y][item.x] = {...item, color: 0, parent: null})
+        })
+    },
+
 };
 
 const mutations = {
@@ -70,7 +86,11 @@ const mutations = {
         }
         state.matrix[payload.y][payload.x] = original
         state.matrix = [...state.matrix]
-    }
+    },
+    tile: (state, tile) => {
+        state.matrix[tile.y][tile.x] = {...tile}
+        state.matrix = [...state.matrix]
+    },
 };
 
 export default {
