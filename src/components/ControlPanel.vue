@@ -5,6 +5,12 @@
             <div class="panel__actions">
                 <button class="btn btn--primary" v-on:click="findBFS">Solve (BFS)</button>
                 <button class="btn btn--ghost" v-on:click="findDFS">Solve (DFS)</button>
+                <div class="slider" :class="{ 'is-disabled': isBfsRunning || isDfsRunning }">
+                    <label for="speed">Step delay: {{ stepDelayMs }} ms</label>
+                    <input id="speed" type="range" min="0" max="200" step="1" v-model.number="stepDelayMs" :disabled="isBfsRunning || isDfsRunning" />
+                    <label for="path">Path paint delay: {{ pathDelayMs }} ms</label>
+                    <input id="path" type="range" min="0" max="200" step="5" v-model.number="pathDelayMs" :disabled="isBfsRunning || isDfsRunning" />
+                </div>
                 <button class="btn btn--ghost" v-on:click="generate">Generate Maze</button>
                 <button class="btn btn--ghost" v-on:click="handleReset">Reset</button>
                 <button class="btn btn--ghost" v-on:click="openInstructions">Instructions</button>
@@ -65,7 +71,7 @@
                 this.bfsMs = 0
                 this.isBfsRunning = true
                 this.bfsStart = (performance && performance.now ? performance.now() : Date.now())
-                await BFS.findPath()
+                await BFS.findPath({ stepDelayMs: this.stepDelayMs, pathDelayMs: this.pathDelayMs })
                 const t1 = (performance && performance.now ? performance.now() : Date.now())
                 this.bfsMs = Math.max(0, Math.round(t1 - this.bfsStart))
                 this.isBfsRunning = false
@@ -78,7 +84,7 @@
                 this.dfsMs = 0
                 this.isDfsRunning = true
                 this.dfsStart = (performance && performance.now ? performance.now() : Date.now())
-                await DFS.findPath()
+                await DFS.findPath({ stepDelayMs: this.stepDelayMs, pathDelayMs: this.pathDelayMs })
                 const t1 = (performance && performance.now ? performance.now() : Date.now())
                 this.dfsMs = Math.max(0, Math.round(t1 - this.dfsStart))
                 this.isDfsRunning = false
@@ -142,6 +148,8 @@
                 bfsStart: null,
                 dfsStart: null,
                 rafId: null,
+                stepDelayMs: 1,
+                pathDelayMs: 50,
             }
         }
     }
@@ -186,6 +194,28 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
+        width: 100%;
+    }
+
+    .slider {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 6px;
+        background: #ffffff;
+        border: 1px solid rgba(2, 6, 23, 0.06);
+        border-radius: 10px;
+        padding: 8px 10px;
+    }
+    .slider.is-disabled {
+        opacity: 0.6;
+        filter: grayscale(0.2);
+    }
+    .slider label {
+        font-size: 12px;
+        color: #334155;
+        font-weight: 600;
+    }
+    .slider input[type="range"] {
         width: 100%;
     }
 
