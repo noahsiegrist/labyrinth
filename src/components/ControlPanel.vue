@@ -3,10 +3,15 @@
         <div class="panel">
             <div class="panel__title">Labyrinth</div>
             <div class="panel__actions">
-                <button class="btn btn--primary" v-on:click="findPath">Find Path</button>
+                <button class="btn btn--primary" v-on:click="findBFS">Solve (BFS)</button>
+                <button class="btn btn--ghost" v-on:click="findDFS">Solve (DFS)</button>
                 <button class="btn btn--ghost" v-on:click="generate">Generate Maze</button>
                 <button class="btn btn--ghost" v-on:click="handleReset">Reset</button>
                 <button class="btn btn--ghost" v-on:click="openInstructions">Instructions</button>
+            </div>
+            <div class="panel__stats">
+                <div class="stat"><span class="stat__label">BFS</span><span class="stat__value">{{ formatMs(bfsMs) }}</span></div>
+                <div class="stat"><span class="stat__label">DFS</span><span class="stat__value">{{ formatMs(dfsMs) }}</span></div>
             </div>
         </div>
         
@@ -30,7 +35,8 @@
 </template>
 
 <script>
-    import PathFinder from '@/services/pathfinder'
+    import BFS from '@/services/bfs'
+    import DFS from '@/services/dfs'
     import {mapActions, mapGetters, mapMutations} from 'vuex'
 
     export default {
@@ -44,22 +50,67 @@
             generate() {
                 this.clearDrawState()
                 this.generateMaze()
+                this.resetTimes()
             },
             handleReset() {
                 this.clearDrawState()
                 this.reset()
+                this.resetTimes()
             },
-            findPath() {
+            async findBFS() {
+                if (this.isBfsRunning || this.isDfsRunning) return
                 if (this.start && this.start.color !== 0) {
                     this.reset()
                 }
-                PathFinder.findPath()
+                this.bfsMs = 0
+                this.isBfsRunning = true
+                this.bfsStart = (performance && performance.now ? performance.now() : Date.now())
+                await BFS.findPath()
+                const t1 = (performance && performance.now ? performance.now() : Date.now())
+                this.bfsMs = Math.max(0, Math.round(t1 - this.bfsStart))
+                this.isBfsRunning = false
+            },
+            async findDFS() {
+                if (this.isBfsRunning || this.isDfsRunning) return
+                if (this.start && this.start.color !== 0) {
+                    this.reset()
+                }
+                this.dfsMs = 0
+                this.isDfsRunning = true
+                this.dfsStart = (performance && performance.now ? performance.now() : Date.now())
+                await DFS.findPath()
+                const t1 = (performance && performance.now ? performance.now() : Date.now())
+                this.dfsMs = Math.max(0, Math.round(t1 - this.dfsStart))
+                this.isDfsRunning = false
             },
             openInstructions() {
                 this.showInstructions = true
             },
             closeInstructions() {
                 this.showInstructions = false
+            },
+            resetTimes() {
+                this.bfsMs = 0
+                this.dfsMs = 0
+                this.isBfsRunning = false
+                this.isDfsRunning = false
+                this.bfsStart = null
+                this.dfsStart = null
+            },
+            onTick() {
+                const now = (performance && performance.now ? performance.now() : Date.now())
+                if (this.isBfsRunning && this.bfsStart != null) {
+                    this.bfsMs = Math.max(0, Math.round(now - this.bfsStart))
+                }
+                if (this.isDfsRunning && this.dfsStart != null) {
+                    this.dfsMs = Math.max(0, Math.round(now - this.dfsStart))
+                }
+            },
+            formatMs(value) {
+                if (value === null || value === undefined) return '0 ms'
+                if (value < 1000) return `${value} ms`
+                const secs = (value / 1000).toFixed(2)
+                return `${secs} s`
             }
         },
         mounted() {
@@ -71,10 +122,26 @@
                     this.closeInstructions()
                 }
             })
+            // Use requestAnimationFrame for smoother, longer, drift-free updates
+            const loop = () => {
+                this.onTick()
+                this.rafId = requestAnimationFrame(loop)
+            }
+            this.rafId = requestAnimationFrame(loop)
+        },
+        beforeDestroy() {
+            if (this.rafId) cancelAnimationFrame(this.rafId)
         },
         data() {
             return {
                 showInstructions: false,
+                bfsMs: 0,
+                dfsMs: 0,
+                isBfsRunning: false,
+                isDfsRunning: false,
+                bfsStart: null,
+                dfsStart: null,
+                rafId: null,
             }
         }
     }
@@ -120,6 +187,33 @@
         flex-direction: column;
         gap: 10px;
         width: 100%;
+    }
+
+    .panel__stats {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 4px;
+    }
+    .stat {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #ffffff;
+        border: 1px solid rgba(2, 6, 23, 0.06);
+        border-radius: 10px;
+        padding: 6px 10px;
+    }
+    .stat__label {
+        font-weight: 700;
+        font-size: 12px;
+        letter-spacing: 0.3px;
+        color: #334155;
+        text-transform: uppercase;
+    }
+    .stat__value {
+        font-weight: 700;
+        color: #0f172a;
     }
 
     .btn {
