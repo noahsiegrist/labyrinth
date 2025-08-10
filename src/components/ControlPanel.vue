@@ -6,13 +6,14 @@
 
 <script>
     import PathFinder from '@/services/pathfinder'
-    import {mapActions, mapGetters} from 'vuex'
+    import {mapActions, mapGetters, mapMutations} from 'vuex'
 
     export default {
         name: 'ControlPanel',
         methods: {
             ...mapActions(["reset"]),
             ...mapGetters(['start']),
+            ...mapMutations(['clearDrawState']),
             findPath() {
                 if (this.start.color !== 0) {
                     console.log('reset')
@@ -20,6 +21,13 @@
                 }
                 PathFinder.findPath()
             },
+        },
+        mounted() {
+            window.addEventListener('keyup', (e) => {
+                if (e.key === 'Shift') {
+                    this.clearDrawState();
+                }
+            })
         },
     }
 </script>

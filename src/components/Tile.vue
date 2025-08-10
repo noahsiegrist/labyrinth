@@ -11,25 +11,26 @@
         </div>
         <button
                 class="right"
-                v-on:mouseover.shift="toggleWall({x: tile.x, y: tile.y, side: 'right'})"
+                v-on:mouseover.shift="connectToLastAndSet({x: tile.x, y: tile.y, side: 'right'})"
                 v-on:click="toggleWall({x: tile.x, y: tile.y, side: 'right'})"
         ></button>
         <button
                 class="bottom"
-                v-on:mouseover.shift="toggleWall({x: tile.x, y: tile.y, side: 'bottom'})"
+                v-on:mouseover.shift="connectToLastAndSet({x: tile.x, y: tile.y, side: 'bottom'})"
                 v-on:click="toggleWall({x: tile.x, y: tile.y, side: 'bottom'})"
         ></button>
     </div>
 </template>
 
 <script>
-    import {mapMutations} from 'vuex'
+    import {mapActions, mapMutations} from 'vuex'
 
     export default {
         name: 'Tile',
         props: ['tile'],
         methods: {
             ...mapMutations(['toggleWall']),
+            ...mapActions(['connectToLastAndSet'])
         },
         computed: {
             color() {
