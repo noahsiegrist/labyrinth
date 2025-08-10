@@ -92,13 +92,8 @@ const actions = {
 
         return state.matrix = matrix
     },
-    reset({state}) {
-        state.matrix.forEach(row => {
-            row.forEach(async item => {
-                state.matrix[item.y][item.x] = {...item, color: 0, parent: null}
-                await new Promise(resolve => setTimeout(resolve, 1))
-            })
-        })
+    reset({ commit }) {
+        commit('resetMatrix')
     },
 
     // Draw the new edge and connect it with the shortest Manhattan path to the last Shift-drawn edge
@@ -151,6 +146,16 @@ const actions = {
 };
 
 const mutations = {
+    resetMatrix: (state) => {
+        for (let i = 0; i < state.n; i++) {
+            for (let j = 0; j < state.m; j++) {
+                const item = state.matrix[i][j]
+                state.matrix[i][j] = { ...item, color: 0, parent: null }
+            }
+        }
+        state.lastDrawEdge = null
+        state.matrix = [...state.matrix]
+    },
     setLastDrawEdge: (state, payload) => {
         state.lastDrawEdge = payload ? { ...payload } : null
     },
