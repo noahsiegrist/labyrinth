@@ -4,6 +4,7 @@
             <div class="panel__title">Labyrinth</div>
             <div class="panel__actions">
                 <button class="btn btn--primary" v-on:click="findPath">Find Path</button>
+                <button class="btn btn--ghost" v-on:click="generate">Generate Maze</button>
                 <button class="btn btn--ghost" v-on:click="handleReset">Reset</button>
                 <button class="btn btn--ghost" v-on:click="openInstructions">Instructions</button>
             </div>
@@ -38,8 +39,12 @@
             ...mapGetters(['start'])
         },
         methods: {
-            ...mapActions(["reset"]),
+            ...mapActions(["reset", "generateMaze"]),
             ...mapMutations(['clearDrawState']),
+            generate() {
+                this.clearDrawState()
+                this.generateMaze()
+            },
             handleReset() {
                 this.clearDrawState()
                 this.reset()

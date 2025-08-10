@@ -24,17 +24,21 @@ async function findPath() {
         element.color = 3
         store.commit('tile', element)
 
-        if (!element.right) {
-            add(queue, store.getters.matrix[element.y][element.x + 1], element)
+        const matrix = store.getters.matrix
+        const maxY = matrix.length - 1
+        const maxX = matrix[element.y].length - 1
+
+        if (!element.right && element.x < maxX) {
+            add(queue, matrix[element.y][element.x + 1], element)
         }
-        if (!element.bottom) {
-            add(queue, store.getters.matrix[element.y + 1][element.x], element)
+        if (!element.bottom && element.y < maxY) {
+            add(queue, matrix[element.y + 1][element.x], element)
         }
-        if (!element.left) {
-            add(queue, store.getters.matrix[element.y][element.x - 1], element)
+        if (!element.left && element.x > 0) {
+            add(queue, matrix[element.y][element.x - 1], element)
         }
-        if (!element.top) {
-            add(queue, store.getters.matrix[element.y - 1][element.x], element)
+        if (!element.top && element.y > 0) {
+            add(queue, matrix[element.y - 1][element.x], element)
         }
         element = queue.shift()
 

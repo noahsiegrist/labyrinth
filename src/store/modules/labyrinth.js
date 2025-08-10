@@ -143,9 +143,118 @@ const actions = {
         commit('setLastDrawEdge', newEdge)
     },
 
+    // Generate a random perfect maze using recursive backtracker (iterative DFS)
+    generateMaze({ state, commit }) {
+        const height = state.n
+        const width = state.m
+
+        // Build a fresh matrix with all walls present
+        const matrix = []
+        for (let y = 0; y < height; y++) {
+            const row = []
+            for (let x = 0; x < width; x++) {
+                row.push({
+                    y,
+                    x,
+                    top: false,
+                    right: false,
+                    bottom: false,
+                    left: false,
+                    color: 0,
+                    parent: null,
+                })
+            }
+            matrix.push(row)
+        }
+
+        // Set all walls (both sides for interior edges; borders too)
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const cell = matrix[y][x]
+                if (x === 0) cell.left = true
+                if (y === 0) cell.top = true
+                if (x === width - 1) cell.right = true
+                if (y === height - 1) cell.bottom = true
+
+                if (x < width - 1) {
+                    cell.right = true
+                    const rightNeighbour = matrix[y][x + 1]
+                    rightNeighbour.left = true
+                }
+                if (y < height - 1) {
+                    cell.bottom = true
+                    const bottomNeighbour = matrix[y + 1][x]
+                    bottomNeighbour.top = true
+                }
+            }
+        }
+
+        // Helper to remove wall between two adjacent cells
+        function removeWall(ax, ay, bx, by) {
+            if (ax === bx) {
+                if (by === ay + 1) {
+                    // b is below a
+                    matrix[ay][ax].bottom = false
+                    matrix[by][bx].top = false
+                } else if (by === ay - 1) {
+                    // b is above a
+                    matrix[ay][ax].top = false
+                    matrix[by][bx].bottom = false
+                }
+            } else if (ay === by) {
+                if (bx === ax + 1) {
+                    // b is right of a
+                    matrix[ay][ax].right = false
+                    matrix[by][bx].left = false
+                } else if (bx === ax - 1) {
+                    // b is left of a
+                    matrix[ay][ax].left = false
+                    matrix[by][bx].right = false
+                }
+            }
+        }
+
+        // Iterative DFS (recursive backtracker)
+        const visited = Array.from({ length: height }, () => Array(width).fill(false))
+        const stack = []
+        const startY = Math.floor(Math.random() * height)
+        const startX = Math.floor(Math.random() * width)
+        stack.push({ x: startX, y: startY })
+        visited[startY][startX] = true
+
+        while (stack.length > 0) {
+            const current = stack[stack.length - 1]
+            const { x, y } = current
+
+            const neighbors = []
+            if (x > 0 && !visited[y][x - 1]) neighbors.push({ x: x - 1, y })
+            if (x < width - 1 && !visited[y][x + 1]) neighbors.push({ x: x + 1, y })
+            if (y > 0 && !visited[y - 1][x]) neighbors.push({ x, y: y - 1 })
+            if (y < height - 1 && !visited[y + 1][x]) neighbors.push({ x, y: y + 1 })
+
+            if (neighbors.length > 0) {
+                const next = neighbors[Math.floor(Math.random() * neighbors.length)]
+                removeWall(x, y, next.x, next.y)
+                visited[next.y][next.x] = true
+                stack.push(next)
+            } else {
+                stack.pop()
+            }
+        }
+
+        // Open entrance and exit for aesthetics
+        matrix[0][0].top = false
+        matrix[height - 1][width - 1].bottom = false
+
+        commit('setMatrix', matrix)
+    },
+
 };
 
 const mutations = {
+    setMatrix: (state, newMatrix) => {
+        state.matrix = newMatrix
+    },
     resetMatrix: (state) => {
         for (let i = 0; i < state.n; i++) {
             for (let j = 0; j < state.m; j++) {
