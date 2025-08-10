@@ -7,9 +7,9 @@
                 <button class="btn btn--ghost" v-on:click="findDFS">Solve (DFS)</button>
                 <div class="slider" :class="{ 'is-disabled': isBfsRunning || isDfsRunning }">
                     <label for="speed">Step delay: {{ stepDelayMs }} ms</label>
-                    <input id="speed" type="range" min="0" max="200" step="1" v-model.number="stepDelayMs" :disabled="isBfsRunning || isDfsRunning" />
+                    <input id="speed" type="range" min="0" max="30" step="1" v-model.number="stepDelayMs" :disabled="isBfsRunning || isDfsRunning" />
                     <label for="path">Path paint delay: {{ pathDelayMs }} ms</label>
-                    <input id="path" type="range" min="0" max="200" step="5" v-model.number="pathDelayMs" :disabled="isBfsRunning || isDfsRunning" />
+                    <input id="path" type="range" min="0" max="50" step="1" v-model.number="pathDelayMs" :disabled="isBfsRunning || isDfsRunning" />
                 </div>
                 <button class="btn btn--ghost" v-on:click="generate">Generate Maze</button>
                 <button class="btn btn--ghost" v-on:click="handleReset">Reset</button>
@@ -149,7 +149,7 @@
                 dfsStart: null,
                 rafId: null,
                 stepDelayMs: 1,
-                pathDelayMs: 50,
+                pathDelayMs: 30,
             }
         }
     }
